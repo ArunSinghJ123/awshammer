@@ -1,6 +1,7 @@
 
 ###########################################################################
-#lambda - An extension of aws-tag-explorer for the ngap2 account taggging
+#lambda - A tagging script using tag editor boto3 ResourceTag
+# for the ngap2 account taggging
 #@arunsingh.jeysinghjacob
 ###########################################################################
 import boto3
@@ -49,14 +50,11 @@ def s3parsing(bucket, key, query):
         InputSerialization = {'CSV': {"FileHeaderInfo": "Use"}},
         OutputSerialization = {'CSV': {}},
     )
-
-    gen_list = []
     for event in response['Payload']:
         if 'Records' in event:
             records = event['Records']['Payload'].decode('utf-8')
             result = records.strip("\n").replace('\n', ',')
     client = boto3.client('resourcegroupstaggingapi')
-
     response = client.tag_resources(ResourceARNList=result.split(','), Tags={'new': 'no'})
     print (response)
 
