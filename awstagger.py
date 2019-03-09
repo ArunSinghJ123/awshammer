@@ -32,11 +32,13 @@ def input_args():
                         help="Provide the bucket key to save CSV file")
     parser.add_argument("--query",
                         help="Query DDL filename")
+    parser.add_argument("--newtags",
+                        help="{'tag-name': 'tag-value'")
     return parser.parse_args()
 
 ###### Query from s3 #######
 
-def s3parsing(bucket, key, query):
+def s3parsing(bucket, key, query, newtags):
     s3 = boto3.client('s3')
     print ('_____________......____________')
     with open(query) as queryfile:
@@ -55,7 +57,7 @@ def s3parsing(bucket, key, query):
             records = event['Records']['Payload'].decode('utf-8')
             result = records.strip("\n").replace('\n', ',')
     client = boto3.client('resourcegroupstaggingapi')
-    response = client.tag_resources(ResourceARNList=result.split(','), Tags={'new': 'no'})
+    response = client.tag_resources(ResourceARNList=result.split(','), Tags=newtags)
     print (response)
 
 def main():
@@ -84,7 +86,7 @@ def main():
     s3.meta.client.upload_file(args.output, args.bucket, args.key)
     time.sleep(10)
     #call the querying functionality to filter and tag
-    s3parsing(args.bucket,args.key,args.query)
+    s3parsing(args.bucket,args.key,args.query,args.newtags)
 
 if __name__ == '__main__':
     main()
