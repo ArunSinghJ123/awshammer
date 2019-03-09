@@ -1,6 +1,13 @@
-# AWSHAMMER
+# awshammer 
 
+- [awsblog](#awsblog)
 - [Usage](#usage)
+
+## awsblog
+
+This a program which was written by following this blog,
+
+[awsbloglink](https://aws.amazon.com/blogs/architecture/how-to-efficiently-extract-and-query-tagged-resources-using-the-aws-resource-tagging-api-and-s3-select-sql/)
 
 ## Usage
 
