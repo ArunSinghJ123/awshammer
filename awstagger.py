@@ -1,8 +1,8 @@
 
 ###########################################################################
-#lambda - A tagging script using tag editor boto3 ResourceTag
+#A tagging script using tag editor boto3 ResourceTag
 # for the any aws account taggging
-#@arunsingh.jeysinghjacob
+# covert this to a handler function and this can be a scheduled lambda
 ###########################################################################
 import boto3
 import argparse
