@@ -10,6 +10,9 @@ import csv
 import json
 import time
 
+# I am just killing my time by testing 
+
+
 field_names = ['ResourceArn', 'TagKey', 'TagValue']
 def writeToCsv(writer, args, tag_list):
     for resource in tag_list:
