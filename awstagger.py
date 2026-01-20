@@ -10,6 +10,9 @@ import csv
 import json
 import time
 
+# I am just killing my time by testing 
+
+
 field_names = ['ResourceArn', 'TagKey', 'TagValue']
 def writeToCsv(writer, args, tag_list):
     for resource in tag_list:
@@ -52,12 +55,14 @@ def s3parsing(bucket, key, query, newtags):
         InputSerialization = {'CSV': {"FileHeaderInfo": "Use"}},
         OutputSerialization = {'CSV': {}},
     )
+    result = ""
     for event in response['Payload']:
         if 'Records' in event:
             records = event['Records']['Payload'].decode('utf-8')
             result = records.strip("\n").replace('\n', ',')
     client = boto3.client('resourcegroupstaggingapi')
-    response = client.tag_resources(ResourceARNList=result.split(','), Tags=newtags)
+    if result:
+        response = client.tag_resources(ResourceARNList=result.split(','), Tags=newtags)
     print (response)
 
 def main():
