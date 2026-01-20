@@ -58,7 +58,7 @@ def s3parsing(bucket, key, query, newtags):
             result = records.strip("\n").replace('\n', ',')
     client = boto3.client('resourcegroupstaggingapi')
     response = client.tag_resources(ResourceARNList=result.split(','), Tags=newtags)
-     print ('_____________......____________'),
+    print('_____________......____________')
     print (response)
 
 def main():
