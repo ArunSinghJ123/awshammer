@@ -41,6 +41,77 @@ def input_args():
 def s3parsing(bucket, key, query, newtags):
     s3 = boto3.client('s3')
     print ('_____________......____________')
+    """
+    Parse S3 data using SQL query and apply tags to resources.
+    
+    Args:
+        bucket (str): S3 bucket name containing the data file
+        key (str): S3 object key for the data file
+        query (str): Path to SQL query file
+        newtags (list): List of tags to apply to resources
+        
+    Raises:
+        ValueError: If required parameters are missing or invalid
+        Exception: If AWS API calls fail
+    """
+    # Input validation
+    if not all([bucket, key, query, newtags]):
+        raise ValueError("All parameters (bucket, key, query, newtags) are required")
+    
+    if not isinstance(newtags, list):
+        raise ValueError("newtags must be a list of tag dictionaries")
+    
+    try:
+        s3 = boto3.client('s3')
+        logger.info('Starting S3 data parsing and tagging process')
+        
+        # Read and validate query file
+        try:
+            with open(query) as queryfile:
+                read_query = queryfile.read()
+                logger.info(f'Executing query: {read_query.strip()}')
+        except FileNotFoundError:
+            raise ValueError(f"Query file not found: {query}")
+        except Exception as e:
+            raise Exception(f"Error reading query file: {str(e)}")
+        
+        # Execute S3 select query
+        response = s3.select_object_content(
+            Bucket=bucket,
+            Key=key,
+            ExpressionType='SQL',
+            Expression=read_query.strip(),
+            InputSerialization = {'CSV': {"FileHeaderInfo": "Use"}},
+            OutputSerialization = {'CSV': {}},
+        )
+        
+        # Process response and extract resource ARNs
+        result = None
+        for event in response['Payload']:
+            if 'Records' in event:
+                records = event['Records']['Payload'].decode('utf-8')
+                result = records.strip("
+        
+        # Validate that we have results before proceeding
+        if not result or result.strip() == '':
+            logger.warning("No resources found in S3 query results")
+            return
+        
+        # Apply tags to resources
+        client = boto3.client('resourcegroupstaggingapi')
+        resource_arns = [arn.strip() for arn in result.split(',') if arn.strip()]
+        
+        if not resource_arns:
+            logger.warning("No valid resource ARNs found after processing")
+            return
+        
+        response = client.tag_resources(ResourceARNList=resource_arns, Tags=newtags)
+        logger.info('Tagging process completed successfully')
+        logger.info(f'Tagging response: {response}')
+        
+    except Exception as e:
+        logger.error(f"Error in s3parsing function: {str(e)}")
+        raise
     with open(query) as queryfile:
         read_query = queryfile.read()
         print (read_query.strip())
