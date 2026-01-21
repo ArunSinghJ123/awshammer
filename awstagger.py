@@ -39,8 +39,6 @@ def input_args():
 ###### Query from s3 #######
 
 def s3parsing(bucket, key, query, newtags):
-    s3 = boto3.client('s3')
-    print ('_____________......____________')
     """
     Parse S3 data using SQL query and apply tags to resources.
     
@@ -112,25 +110,6 @@ def s3parsing(bucket, key, query, newtags):
     except Exception as e:
         logger.error(f"Error in s3parsing function: {str(e)}")
         raise
-    with open(query) as queryfile:
-        read_query = queryfile.read()
-        print (read_query.strip())
-    response = s3.select_object_content(
-        Bucket=bucket,
-        Key=key,
-        ExpressionType='SQL',
-        Expression=read_query.strip(),
-        InputSerialization = {'CSV': {"FileHeaderInfo": "Use"}},
-        OutputSerialization = {'CSV': {}},
-    )
-    for event in response['Payload']:
-        if 'Records' in event:
-            records = event['Records']['Payload'].decode('utf-8')
-            result = records.strip("\n").replace('\n', ',')
-    client = boto3.client('resourcegroupstaggingapi')
-    response = client.tag_resources(ResourceARNList=result.split(','), Tags=newtags)
-    print('_____________......____________')
-    print (response)
 
 def main():
     args = input_args()
