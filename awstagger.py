@@ -93,6 +93,8 @@ def s3parsing(bucket, key, query, newtags):
         # Validate that we have results before proceeding
         if not result or result.strip() == '':
             logger.warning("No resources found in S3 query results")
+            print("Extracting tags for resource: " +
+              resource['ResourceARN'] + "...")
             return
         
         # Apply tags to resources
